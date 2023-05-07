@@ -10,29 +10,42 @@ namespace EaAppFramework.Driver
 {
     public class PlaywrightDriver:IDisposable
     {
+        private readonly Task<IBrowser> _browser;
         private readonly Task<IPage> _page;
-        private readonly TestSettings testSettings;
-        private IBrowser? _browser;
-        public PlaywrightDriver( TestSettings testSettings)
+        private readonly TestSettings _testSettings;
+        private readonly IPlaywrightDriverInitializer _playwrightDriverInitializer;
+       
+       
+        public PlaywrightDriver( TestSettings testSettings, IPlaywrightDriverInitializer playwrightDriverInitializer)
         {
-            // have to do with Task Run because the method is async
-            _page = Task.Run(InitializePlaywright);
-            this.testSettings = testSettings;
+            _testSettings = testSettings;
+            _playwrightDriverInitializer = playwrightDriverInitializer;
+            _browser = Task.Run(InitializePlaywright);
+            _page = Task.Run(CreatePageAsync);
+            
         }
         public IPage Page => _page.Result;
 
        
 
-        public async Task<IPage> InitializePlaywright()
+        private async Task<IBrowser> InitializePlaywright()
         {
-           
+            return _testSettings.DriverType switch
+            {
+                DriverType.Chrome => await _playwrightDriverInitializer.GetChromeDriverAsync(_testSettings),
+                DriverType.Firefox => await _playwrightDriverInitializer.GetFirefoxDriverAsync(_testSettings),
+               _ => await _playwrightDriverInitializer.GetChromiumDriverAsync(_testSettings)
+            }; 
+        }
 
-            return await _browser.NewPageAsync();
+        private async Task<IPage> CreatePageAsync()
+        {
+            return await(await _browser).NewPageAsync();
         }
 
         public void  Dispose()
         {
-           _browser?.DisposeAsync();
+           _browser?.Dispose();
         }
     }
 }

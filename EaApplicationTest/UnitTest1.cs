@@ -1,15 +1,29 @@
+using EaAppFramework.Config;
 using EaAppFramework.Driver;
 using Microsoft.Playwright;
 
 namespace EaApplicationTest
 {
-    public class UnitTest1:IClassFixture<PlaywrightDriver>
+    public class UnitTest1:IClassFixture<PlaywrightDriverInitializer>
     {
-        private readonly PlaywrightDriver playwrightDriver;
+        private readonly PlaywrightDriverInitializer _playwrightDriverInitializer;
+        private readonly PlaywrightDriver _playwrightDriver;
 
-        public UnitTest1(PlaywrightDriver playwrightDriver)
+        public UnitTest1(PlaywrightDriverInitializer playwrightDriverInitializer)
         {
-            this.playwrightDriver = playwrightDriver;
+            var testSettings = new TestSettings()
+            {
+                DriverType=DriverType.Chromium,
+                Headless=false,
+                Timeout=15000,
+                SlowMo = 500,
+                ApplicationUrl = "http://eaapp.somee.com"
+            };
+
+
+
+            _playwrightDriverInitializer = playwrightDriverInitializer;
+            _playwrightDriver = new PlaywrightDriver(testSettings, _playwrightDriverInitializer);
         }
 
         [Fact]
@@ -18,7 +32,7 @@ namespace EaApplicationTest
             //PlaywrightDriver playwrightDriver = new PlaywrightDriver(); - this is abudnant know it is replaced with IclassFixture and the constructor
 
 
-            var _page = playwrightDriver.Page;
+            var _page = _playwrightDriver.Page;
 
             await _page.GotoAsync("http://eaapp.somee.com");
             
