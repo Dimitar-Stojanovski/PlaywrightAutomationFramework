@@ -155,9 +155,6 @@ namespace EaApplicationTest
         public async Task RegisterWithAutoFixtureData(ProductDto product)
         {
             var _page = _playwrightDriver.Page;
-
-
-            //await _page.GotoAsync(_testSettings.ApplicationUrl);
             var homePage = new HomePage(_page);
             await homePage.ClickOnProductLink();
 
