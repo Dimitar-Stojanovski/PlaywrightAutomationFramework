@@ -1,5 +1,7 @@
+using AutoFixture.Xunit2;
 using EaAppFramework.Config;
 using EaAppFramework.Driver;
+using EaApplicationTest.Models;
 using EaApplicationTest.Pages;
 using Microsoft.Playwright;
 
@@ -83,5 +85,108 @@ namespace EaApplicationTest
 
            
         }
+
+        [Theory]
+        [InlineData("Dimitar Speaker1", "Test Speaker1", 200, "3")]
+        [InlineData("Dimitar Speaker2", "Test Speaker2", 300, "3")]
+        [InlineData("Dimitar Speaker3", "Test Speaker3", 400, "2")]
+        [InlineData("Dimitar Speaker4", "Test Speaker4", 500, "1")]
+        public async Task RegisterProductWithData(string productName, string description, decimal productPrice, string productOption)
+        {
+            var _page = _playwrightDriver.Page;
+            await _page.GotoAsync(_testSettings.ApplicationUrl);
+            var homePage = new HomePage(_page);
+            await homePage.ClickOnProductLink();
+
+            var productListPage = new ProductListPage(_page);
+            productListPage.ClickCreateProductLink();
+
+            var productPage = new ProductPage(_page);
+            await productPage.CreateProduct(productName, description, productPrice, productOption);
+            await productPage.ClickCreateBtn();
+            await productListPage.ClickEditProductDetails(productName);
+
+            //Assert
+            await Assertions.Expect(productListPage.VerifyProductName().Result).ToHaveTextAsync(productName);
+            
+
+
+        }
+
+
+        [Fact]
+        public async Task RegisterProductWithConcreteData()
+        {
+            var _page = _playwrightDriver.Page;
+
+
+            await _page.GotoAsync(_testSettings.ApplicationUrl);
+            var homePage = new HomePage(_page);
+            await homePage.ClickOnProductLink();
+
+            var productListPage = new ProductListPage(_page);
+            productListPage.ClickCreateProductLink();
+
+
+
+            //Creating the product
+            var product = new ProductDto()
+            {
+                Name = "Test Product",
+                Description = "Description",
+                Price = 1000,
+                productType = ProductType.CPU
+            };
+
+            var productPage = new ProductPage(_page);
+            await productPage.CreateProduct(product);
+            await productPage.ClickCreateBtn();
+            await productListPage.ClickEditProductDetails(product.Name);
+
+            //Assert
+            await Assertions.Expect(productListPage.VerifyProductName().Result).ToHaveTextAsync(product.Name);
+
+
+
+        }
+
+
+        [Theory,AutoData]
+        public async Task RegisterWithAutoFixtureData(ProductDto product)
+        {
+            var _page = _playwrightDriver.Page;
+
+
+            //await _page.GotoAsync(_testSettings.ApplicationUrl);
+            var homePage = new HomePage(_page);
+            await homePage.ClickOnProductLink();
+
+            var productListPage = new ProductListPage(_page);
+            productListPage.ClickCreateProductLink();
+
+
+
+            //Auto Data will insert random Data
+           /* var product = new ProductDto()
+            {
+                Name = "Test Product",
+                Description = "Description",
+                Price = 1000,
+                productType = ProductType.CPU
+            };*/
+
+            var productPage = new ProductPage(_page);
+            await productPage.CreateProduct(product);
+            await productPage.ClickCreateBtn();
+            await productListPage.ClickEditProductDetails(product.Name);
+
+            //Assert
+            await Assertions.Expect(productListPage.VerifyProductName().Result).ToHaveTextAsync(product.Name);
+
+
+
+        }
+
+
     }
 }
