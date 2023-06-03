@@ -1,4 +1,5 @@
-﻿using Microsoft.Playwright;
+﻿using EaApplicationTest.Models;
+using Microsoft.Playwright;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -34,6 +35,14 @@ namespace EaApplicationTest.Pages
 
         public async Task ClickCreateBtn()=> await _createBtn.ClickAsync();
 
-        
+        public async Task CreateProduct(ProductDto product)
+        {
+            await _nameField.FillAsync(product.Name);
+            await _descriptionField.FillAsync(product.Description);
+            await _priceField.FillAsync(product.Price.ToString());
+            await _selectProduct.SelectOptionAsync(product.productType.ToString());
+        }
+
+
     }
 }

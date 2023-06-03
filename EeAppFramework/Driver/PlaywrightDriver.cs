@@ -22,6 +22,7 @@ namespace EaAppFramework.Driver
             _playwrightDriverInitializer = playwrightDriverInitializer;
             _browser = Task.Run(InitializePlaywright);
             _page = Task.Run(CreatePageAsync);
+             Task.Run(NavigateToUrl);
             
         }
         public IPage Page => _page.Result;
@@ -41,6 +42,11 @@ namespace EaAppFramework.Driver
         private async Task<IPage> CreatePageAsync()
         {
             return await(await _browser).NewPageAsync();
+        }
+
+        private async Task NavigateToUrl()
+        {
+            await Page.GotoAsync(_testSettings.ApplicationUrl);
         }
 
         public void  Dispose()
