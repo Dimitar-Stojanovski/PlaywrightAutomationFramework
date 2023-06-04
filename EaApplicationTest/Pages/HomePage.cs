@@ -1,4 +1,6 @@
-﻿using Microsoft.Playwright;
+﻿using EaAppFramework.Driver;
+using EaApplicationTest.Interfaces;
+using Microsoft.Playwright;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace EaApplicationTest.Pages
 {
-    public class HomePage
+    public class HomePage : IHomePage
     {
         private readonly IPage page;
 
@@ -15,14 +17,11 @@ namespace EaApplicationTest.Pages
         private ILocator _productLink => page.GetByRole(AriaRole.Link, new() { Name = "Product" });
 
 
-        public HomePage(IPage page)
-        {
-            this.page = page;
-        }
+        public HomePage(IPlaywrightDriver playwrightDriver) => this.page = playwrightDriver.Page;
 
-        public async Task ClickRegisterLink()=> await _registerLink.ClickAsync();
-        public async Task ClickOnProductLink()=> await _productLink.ClickAsync();
-        
-        
+        public async Task ClickRegisterLink() => await _registerLink.ClickAsync();
+        public async Task ClickOnProductLink() => await _productLink.ClickAsync();
+
+
     }
 }
