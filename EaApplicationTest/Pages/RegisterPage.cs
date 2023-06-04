@@ -1,4 +1,6 @@
-﻿using Microsoft.Playwright;
+﻿using EaAppFramework.Driver;
+using EaApplicationTest.Interfaces;
+using Microsoft.Playwright;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace EaApplicationTest.Pages
 {
-    public class RegisterPage
+    public class RegisterPage : IRegisterPage
     {
         private readonly IPage page;
 
@@ -17,16 +19,13 @@ namespace EaApplicationTest.Pages
         private ILocator emailInput => page.GetByLabel("Email");
         private ILocator registerButton => page.GetByRole(AriaRole.Button, new() { Name = "Register" });
 
-        public RegisterPage(IPage page)
-        {
-            this.page = page;
-        }
+        public RegisterPage(PlaywrightDriver playwrightDriver) => this.page = playwrightDriver.Page;
 
-        public async Task EnterUserName(string userName)=> await userNameInput.FillAsync(userName);
-        public async Task EnterPassword(string password)=> await passwordInput.FillAsync(password);
+        public async Task EnterUserName(string userName) => await userNameInput.FillAsync(userName);
+        public async Task EnterPassword(string password) => await passwordInput.FillAsync(password);
         public async Task EnterConfirmPass(string password) => await confirmPassword.FillAsync(password);
         public async Task EnterEmail(string email) => await emailInput.FillAsync(email);
-        public async Task ClickRegisterBtn()=> await registerButton.ClickAsync();
+        public async Task ClickRegisterBtn() => await registerButton.ClickAsync();
 
     }
 }

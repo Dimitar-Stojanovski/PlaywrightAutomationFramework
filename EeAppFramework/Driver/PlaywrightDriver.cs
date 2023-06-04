@@ -8,26 +8,26 @@ using System.Threading.Tasks;
 
 namespace EaAppFramework.Driver
 {
-    public class PlaywrightDriver:IDisposable
+    public class PlaywrightDriver : IDisposable, IPlaywrightDriver
     {
         private readonly Task<IBrowser> _browser;
         private readonly Task<IPage> _page;
         private readonly TestSettings _testSettings;
         private readonly IPlaywrightDriverInitializer _playwrightDriverInitializer;
-       
-       
-        public PlaywrightDriver( TestSettings testSettings, IPlaywrightDriverInitializer playwrightDriverInitializer)
+
+
+        public PlaywrightDriver(TestSettings testSettings, IPlaywrightDriverInitializer playwrightDriverInitializer)
         {
             _testSettings = testSettings;
             _playwrightDriverInitializer = playwrightDriverInitializer;
             _browser = Task.Run(InitializePlaywright);
             _page = Task.Run(CreatePageAsync);
-             Task.Run(NavigateToUrl);
-            
+            Task.Run(NavigateToUrl);
+
         }
         public IPage Page => _page.Result;
 
-       
+
 
         private async Task<IBrowser> InitializePlaywright()
         {
@@ -35,23 +35,23 @@ namespace EaAppFramework.Driver
             {
                 DriverType.Chrome => await _playwrightDriverInitializer.GetChromeDriverAsync(_testSettings),
                 DriverType.Firefox => await _playwrightDriverInitializer.GetFirefoxDriverAsync(_testSettings),
-               _ => await _playwrightDriverInitializer.GetChromiumDriverAsync(_testSettings)
-            }; 
+                _ => await _playwrightDriverInitializer.GetChromiumDriverAsync(_testSettings)
+            };
         }
 
         private async Task<IPage> CreatePageAsync()
         {
-            return await(await _browser).NewPageAsync();
+            return await (await _browser).NewPageAsync();
         }
 
-        private async Task NavigateToUrl()
+        public async Task NavigateToUrl()
         {
             await Page.GotoAsync(_testSettings.ApplicationUrl);
         }
 
-        public void  Dispose()
+        public void Dispose()
         {
-           _browser?.Dispose();
+            _browser?.Dispose();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using EaApplicationTest.Models;
+﻿using EaAppFramework.Driver;
+using EaApplicationTest.Interfaces;
+using EaApplicationTest.Models;
 using Microsoft.Playwright;
 using System;
 using System.Collections.Generic;
@@ -9,13 +11,10 @@ using System.Threading.Tasks;
 
 namespace EaApplicationTest.Pages
 {
-    public class ProductPage
+    public class ProductPage : IProductPage
     {
         private readonly IPage page;
-        public ProductPage(IPage page)
-        {
-            this.page = page;
-        }
+        public ProductPage(IPlaywrightDriver playwrightDriver) => this.page = playwrightDriver.Page;
 
         private ILocator createLink => page.GetByRole(AriaRole.Link, new() { Name = "Create" });
         private ILocator _nameField => page.GetByLabel("Name");
@@ -25,7 +24,7 @@ namespace EaApplicationTest.Pages
         private ILocator _createBtn => page.GetByRole(AriaRole.Button, new() { Name = "Create" });
 
 
-        public async Task CreateProduct(string name, string description, decimal price,string productType)
+        public async Task CreateProduct(string name, string description, decimal price, string productType)
         {
             await _nameField.FillAsync(name);
             await _descriptionField.FillAsync(description);
@@ -33,7 +32,7 @@ namespace EaApplicationTest.Pages
             await _selectProduct.SelectOptionAsync(productType);
         }
 
-        public async Task ClickCreateBtn()=> await _createBtn.ClickAsync();
+        public async Task ClickCreateBtn() => await _createBtn.ClickAsync();
 
         public async Task CreateProduct(ProductDto product)
         {
